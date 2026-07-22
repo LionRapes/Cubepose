@@ -1,0 +1,20 @@
+{
+  "name": "Cubepose",
+  "private": true,
+  "scripts": {
+    "dev": "docker-compose --env-file .env-dev up",
+    "dev:build": "docker-compose --env-file .env-dev up --build",
+    "dev:build-only": "docker-compose --env-file .env-dev build",
+    "prod": "docker-compose --env-file .env-prod up",
+    "prod:build": "docker-compose --env-file .env-prod up --build",
+    "prod:build-only": "docker-compose --env-file .env-prod build",
+    "down": "docker-compose --env-file .env-dev down",
+    "logs": "docker-compose logs -f",
+    "logs:server": "docker-compose logs -f server",
+    "logs:client": "docker-compose logs -f client",
+    "shell:server": "docker-compose exec server sh",
+    "shell:client": "docker-compose exec client sh",
+    "clean": "docker-compose --env-file .env-dev down -v --rmi all",
+    "status": "docker-compose ps"
+  }
+}
