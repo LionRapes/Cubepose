@@ -3,11 +3,17 @@
   "private": true,
   "scripts": {
     "dev": "docker-compose --env-file .env-dev up",
+    "client-dev": "docker-compose --env-file .env-dev up client",
+    "server-dev": "docker-compose --env-file .env-dev up server",
     "dev:build": "docker-compose --env-file .env-dev up --build",
     "dev:build-only": "docker-compose --env-file .env-dev build",
+
     "prod": "docker-compose --env-file .env-prod up",
+    "client-prod": "docker-compose --env-file .env-prod up client",
+    "server-prod": "docker-compose --env-file .env-prod up server",
     "prod:build": "docker-compose --env-file .env-prod up --build",
     "prod:build-only": "docker-compose --env-file .env-prod build",
+    
     "down": "docker-compose --env-file .env-dev down",
     "logs": "docker-compose logs -f",
     "logs:server": "docker-compose logs -f server",
