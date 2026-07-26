@@ -20,6 +20,6 @@ export function useTexture<T>(
   return texture;
 }
 
-export function useGradientTexture(colors: string[]) {
+export function useGradientTexture(colors: readonly string[]) {
   return useTexture(colors, createGradientTexture);
 }

@@ -3,7 +3,7 @@ import defaultVertexShader from '../shaders/vertex/default.vert.glsl';
 import defaultFragmentShader from '../shaders/fragment/default.frag.glsl';
 
 interface GradientTextureProps {
-  colors: string[];
+  colors: readonly string[];
   width?: number;
   height?: number;
   position?: [number, number, number];
@@ -11,6 +11,8 @@ interface GradientTextureProps {
   vertexShader?: string;
   fragmentShader?: string;
   uniforms?: Record<string, any>;
+  opacity?: number;
+  transparent?: boolean;
 }
 
 export function GradientTexture({ 
@@ -21,10 +23,13 @@ export function GradientTexture({
   rotation = [0, 0, 0],
   vertexShader,
   fragmentShader,
-  uniforms
+  uniforms,
+  opacity = 1,
+  transparent = false
 }: GradientTextureProps) {
   const texture = useGradientTexture(colors);
   if (!texture) return null;
+  
   return (
     <mesh position={position} rotation={rotation}>
       <planeGeometry args={[width, height]} />
@@ -33,9 +38,11 @@ export function GradientTexture({
           uniforms={{...uniforms, uTexture: { value: texture }}}
           vertexShader={vertexShader || defaultVertexShader}
           fragmentShader={fragmentShader || defaultFragmentShader}
+          transparent={transparent}
+          depthWrite={false}
         />
       ) : (
-        <meshBasicMaterial map={texture} />
+        <meshBasicMaterial map={texture} transparent={transparent} opacity={opacity} depthWrite={false}/>
       )}
     </mesh>
   );

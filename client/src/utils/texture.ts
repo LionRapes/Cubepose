@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-export function createGradientTexture(colors: string[]) {
+export function createGradientTexture(colors: readonly string[]) {
   const data = new Uint8Array(
     colors.flatMap(color => {
       const c = new THREE.Color(color).convertLinearToSRGB();
