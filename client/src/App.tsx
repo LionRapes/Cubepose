@@ -1,17 +1,21 @@
 import { Canvas } from '@react-three/fiber';
 import { Background } from './components/Background';
-import { OrthographicCamera } from '@react-three/drei';
-
+import { OrbitControls, OrthographicCamera } from '@react-three/drei';
+import { CubeContainer } from './components/CubeContainer';
 
 export default function App() {
   return (
-    <Canvas>
+    <Canvas gl={{stencil: true}}>
+      <color attach="background" args={['#000000']} />
       <OrthographicCamera 
         makeDefault 
-        position={[0, 0, 1]} 
-        zoom={1}
+        position={[10, 10, 10]} 
+        zoom={40}
       />
-      <Background />
+      <OrbitControls />
+
+      <Background/>
+      <CubeContainer />
     </Canvas>
   );
 }

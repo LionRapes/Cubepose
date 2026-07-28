@@ -1,4 +1,4 @@
-import { GradientTexture } from './GradientTexture';
+import { GradientTexturePlane } from './GradientTexture';
 import { BACKGROUND_COLORS } from '../config/colors';
 
 import vertexShader from '../shaders/vertex/background.vert.glsl';
@@ -104,16 +104,17 @@ export function Background({
         if (opacity === 0) return null;
 
         return (
-          <GradientTexture
+          <GradientTexturePlane 
             key={index}
             colors={stateColors}
-            width={width}
-            height={height}
+            size={[width, height]}
             position={position}
             rotation={[-Math.PI / 2, 0, 0]}
             vertexShader={vertexShader}
             transparent={true}
+            depthWrite={true}
             uniforms={{ uOpacity: { value: opacity } }}
+            renderOrder={-1}
           />
         );
       })}

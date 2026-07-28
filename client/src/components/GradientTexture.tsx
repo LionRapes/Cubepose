@@ -1,11 +1,8 @@
-import { useGradientTexture } from '../hooks/useTexture';
-import defaultVertexShader from '../shaders/vertex/default.vert.glsl';
-import defaultFragmentShader from '../shaders/fragment/default.frag.glsl';
+import { useGradientMaterial } from '../hooks/useGradientMaterial';
 
-interface GradientTextureProps {
+interface GradientTextureShapeProps {
   colors: readonly string[];
-  width?: number;
-  height?: number;
+  size?: number | [number, number, number] | [number, number];
   position?: [number, number, number];
   rotation?: [number, number, number];
   vertexShader?: string;
@@ -13,37 +10,56 @@ interface GradientTextureProps {
   uniforms?: Record<string, any>;
   opacity?: number;
   transparent?: boolean;
+  depthWrite?: boolean;
+  renderOrder?: number;
 }
 
-export function GradientTexture({ 
-  colors, 
-  width = 2, 
-  height = 2,
+export function GradientTexturePlane({ 
+  colors,
+  size = 8,
   position = [0, 0, 0],
   rotation = [0, 0, 0],
   vertexShader,
   fragmentShader,
   uniforms,
-  opacity = 1,
-  transparent = false
-}: GradientTextureProps) {
-  const texture = useGradientTexture(colors);
+  opacity,
+  transparent,
+  depthWrite,
+  renderOrder = 0
+}: GradientTextureShapeProps) {
+  const texture = useGradientMaterial({colors, vertexShader, fragmentShader, uniforms, opacity, transparent, depthWrite});
   if (!texture) return null;
+  const [w, h] = typeof size === 'number' ? [size, size] : size;
+  
+  return (
+    <mesh position={position} rotation={rotation} renderOrder={renderOrder}>
+      <planeGeometry args={[w, h]}/>
+      <primitive object={texture} attach="material"/>
+    </mesh>
+  );
+}
+
+
+export function GradientTextureCube({ 
+  colors,
+  size = 2,
+  position = [0, 0, 0],
+  rotation = [0, 0, 0],
+  vertexShader,
+  fragmentShader,
+  uniforms,
+  opacity,
+  transparent,
+  depthWrite
+}: GradientTextureShapeProps) {
+  const texture = useGradientMaterial({colors, vertexShader, fragmentShader, uniforms, opacity, transparent, depthWrite});
+  if (!texture) return null;
+  const [w, h, d] = typeof size === 'number' ? [size, size, size] : size;
   
   return (
     <mesh position={position} rotation={rotation}>
-      <planeGeometry args={[width, height]} />
-      {vertexShader || fragmentShader ? (
-        <shaderMaterial
-          uniforms={{...uniforms, uTexture: { value: texture }}}
-          vertexShader={vertexShader || defaultVertexShader}
-          fragmentShader={fragmentShader || defaultFragmentShader}
-          transparent={transparent}
-          depthWrite={false}
-        />
-      ) : (
-        <meshBasicMaterial map={texture} transparent={transparent} opacity={opacity} depthWrite={false}/>
-      )}
+      <boxGeometry args={[w, h, d]} />
+      <primitive object={texture} attach="material" />
     </mesh>
   );
 }
