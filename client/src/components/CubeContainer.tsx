@@ -1,24 +1,44 @@
-import { Mask, RoundedBox, RoundedBoxGeometry, useMask } from "@react-three/drei";
-import { GlowRoundedBox } from "./GlowBox";
+import React from "react";
+import { CubeOffset } from "../types";
+import { GameProvider } from "../context/GameContext";
 
-export function CubeContainer() {
-  const stencil = useMask(1, true);
-  console.log(stencil);
-  
+interface CubeContainerProps {
+  size: [number, number, number];
+  position?: [number, number, number];
+  blockedCells?: CubeOffset[];
+  children: React.ReactNode;
+  onActivate?: (center: [number, number, number]) => void;
+}
+
+export function CubeContainer({
+  size,
+  blockedCells = [],
+  children,
+  position = [0, 0, 0],
+  onActivate
+}: CubeContainerProps) {
+  const [width, height, depth] = size;
+  const center: [number, number, number] = [width / 2, height / 2, depth / 2];
+
+  const handleClick = () => {
+    if (onActivate) {
+      onActivate([
+        position[0] + center[0],
+        position[1] + center[1],
+        position[2] + center[2],
+      ]);
+    }
+  };
+
   return (
-    <>
-      <Mask id={1}>
-        <RoundedBoxGeometry args={[9.7, 9.7, 9.7]} radius={1} smoothness={1} bevelSegments={1}/>
-      </Mask>
-
-
-      <RoundedBox args={[9.7, 9.7, 9.7]} radius={1} smoothness={1} bevelSegments={1}>
-        <meshBasicMaterial color={'red'}/>
-      </RoundedBox>
-
-      <GlowRoundedBox size={10} color="white" glowIntensity={0.15} radius={1} scaleStep={0.01} glowLayers={10} stencil={stencil}/>
-      
-
-    </>
+    <GameProvider width={width} height={height} depth={depth} blockedCells={blockedCells}>
+      <group position={position}>
+        <mesh position={center} onClick={handleClick} visible={false}>
+          <boxGeometry args={[width*1.5, height*1.5, depth*1.5]}/>
+        </mesh>
+        {children}
+      </group>
+    </GameProvider>
+    
   );
 }

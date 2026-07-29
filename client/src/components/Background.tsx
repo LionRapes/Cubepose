@@ -1,16 +1,17 @@
-import { GradientTexturePlane } from './GradientTexture';
 import { BACKGROUND_COLORS } from '../config/colors';
 
 import vertexShader from '../shaders/vertex/background.vert.glsl';
-import { useCallback, useMemo, useRef, useState } from 'react';
-import { EasingName, getEasing } from '../utils/easings';
-import { useAnimation } from '../hooks/useAnimation';
+import { useMemo } from 'react';
+import { EasingName } from '../utils/easings';
 import { useDebugCommands } from '../hooks/useDebugCommands';
+import { ReadonlyVector3Tuple } from '../types';
+import { useBackgroundTransition } from '../hooks/useBackgroundTransition';
+import { useGradientMaterial } from '../hooks/useGradientMaterial';
 
 interface BackgroundProps {
   width?: number;
   height?: number;
-  position?: [number, number, number];
+  position?: ReadonlyVector3Tuple;
   colors?: typeof BACKGROUND_COLORS;
 }
 
@@ -23,63 +24,7 @@ export function Background({
   const stateValues = Object.values(colors);
   const stateKeys = Object.keys(colors);
   
-
-  const [currentStateIndex, setCurrentStateIndex] = useState(0);
-  const previousStateIndexRef = useRef(0);
-  const easeRef = useRef<EasingName>('linear');
-  const flickTimeoutRef = useRef<number | null>(null);
-
-  const { isAnimating, progress, start } = useAnimation();
-
-  const switchTo = useCallback((index: number, duration?: number, ease: EasingName = 'linear') => {
-    if (isAnimating) return;
-    
-    easeRef.current = ease;
-    setCurrentStateIndex((prev) => {
-      previousStateIndexRef.current = prev;
-      return index;
-    });
-    
-    start(duration);
-  }, [isAnimating, currentStateIndex, start]);
-
-  const flick = useCallback((
-    targetIndex: number,
-    appearDuration: number = 1,
-    disappearDuration: number = 1,
-    appearEase?: EasingName,
-    disappearEase?: EasingName,
-    holdDelay: number = 1.0
-  ) => {
-    if (flickTimeoutRef.current) {
-      clearTimeout(flickTimeoutRef.current);
-      flickTimeoutRef.current = null;
-    }
-
-    if (isAnimating) return;
-
-    const originalIndex = currentStateIndex;
-    switchTo(targetIndex, appearDuration, appearEase);
-
-    const totalDelay = (appearDuration + holdDelay) * 1000;
-    flickTimeoutRef.current = setTimeout(() => {
-      switchTo(originalIndex, disappearDuration, disappearEase);
-      flickTimeoutRef.current = null;
-    }, totalDelay);
-
-  }, [isAnimating, currentStateIndex, switchTo]);
-  
-  
-  const getOpacity = useCallback((index: number) => {
-    if (!isAnimating) return index === currentStateIndex ? 1 : 0;
-    const easedProgress = getEasing(easeRef.current)(progress);
-    return index === currentStateIndex 
-      ? easedProgress 
-      : index === previousStateIndexRef.current 
-        ? 1 - easedProgress 
-        : 0;
-  }, [isAnimating, progress, currentStateIndex]);
-  
+  const { getOpacity, isAnimating, switchTo, flick } = useBackgroundTransition();
 
   useDebugCommands( useMemo(() => ({
     bg: (index: number, duration?: number, ease?: EasingName) => {
@@ -102,22 +47,55 @@ export function Background({
         
         const opacity = getOpacity(index);
         if (opacity === 0) return null;
-
         return (
-          <GradientTexturePlane 
+          <BackgroundLayer
             key={index}
             colors={stateColors}
-            size={[width, height]}
+            opacity={opacity}
+            vertexShader={vertexShader}
+            width={width}
+            height={height}
             position={position}
             rotation={[-Math.PI / 2, 0, 0]}
-            vertexShader={vertexShader}
-            transparent={true}
-            depthWrite={true}
-            uniforms={{ uOpacity: { value: opacity } }}
-            renderOrder={-1}
           />
         );
       })}
     </>
+  );
+}
+
+
+function BackgroundLayer({
+  colors,
+  opacity,
+  vertexShader,
+  width,
+  height,
+  position,
+  rotation,
+}: {
+  colors: readonly string[];
+  opacity: number;
+  vertexShader: string;
+  width: number;
+  height: number;
+  position: ReadonlyVector3Tuple;
+  rotation: ReadonlyVector3Tuple;
+}) {
+  const material = useGradientMaterial({
+    colors,
+    vertexShader,
+    uniforms: { uOpacity: { value: opacity } },
+    opacity,
+    transparent: true,
+    depthWrite: true,
+  });
+  if (!material) return null;
+
+  return (
+    <mesh position={position} rotation={rotation} renderOrder={-1} frustumCulled={false}>
+      <planeGeometry args={[width, height]} />
+      <primitive object={material} attach="material" />
+    </mesh>
   );
 }

@@ -1,12 +1,12 @@
-import * as THREE from 'three';
 import { useEffect, useState } from 'react';
 import { createGradientTexture } from '../utils/texture';
+import { Texture } from 'three';
 
 export function useTexture<T>(
   params: T,
-  createTexture: (params: T) => THREE.Texture
+  createTexture: (params: T) => Texture
 ) {
-  const [texture, setTexture] = useState<THREE.Texture | null>(null);
+  const [texture, setTexture] = useState<Texture | null>(null);
 
   useEffect(() => {
     const tex = createTexture(params);

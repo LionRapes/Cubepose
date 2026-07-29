@@ -1,7 +1,9 @@
 import { RoundedBox } from '@react-three/drei';
+import { generateGlowLayers } from '../utils/glow';
 
 interface GlowBoxProps {
-  size?: number | [number, number, number];
+  size: readonly [number, number, number];
+  position?: readonly [number, number, number];
   color?: string;
   glowIntensity?: number;
   glowLayers?: number;
@@ -9,48 +11,25 @@ interface GlowBoxProps {
   radius?: number;
   smoothness?: number;
   bevelSegments?: number;
-  renderOrder?: number;
   stencil?: any;
 }
 
-function generateLayers(
-  size: number | [number, number, number],
-  glowLayers: number,
-  scaleStep: number,
-  glowIntensity: number
-) {
-  const [w, h, d] = typeof size === 'number' ? [size, size, size] : size;
-  const layers = [];
-  for (let i = 0; i <= glowLayers; i++) {
-    const scale = 1 + i * scaleStep;
-    const opacity = i === 0 ? 1 : Math.max(0, glowIntensity / (i * 0.6 + 0.4));
-    layers.push({
-      scale,
-      opacity,
-      transparent: i !== 0,
-      depthWrite: i === 0,
-    });
-  }
-  return { layers, w, h, d };
-}
+export function GlowBox({
+  size,
+  position = [0, 0, 0],
+  color = 'white',
+  glowIntensity = 0.3,
+  glowLayers = 3,
+  scaleStep = 0.08,
+  stencil
+}: GlowBoxProps) {
 
-export function GlowBox(props: GlowBoxProps) {
-  const {
-    size = 10,
-    color = 'white',
-    glowIntensity = 0.3,
-    glowLayers = 3,
-    scaleStep = 0.08,
-    stencil,
-    renderOrder
-  } = props;
-
-  const { layers, w, h, d } = generateLayers(size, glowLayers, scaleStep, glowIntensity);
+  const { layers, w, h, d } = generateGlowLayers(size, glowLayers, scaleStep, glowIntensity);
 
   return (
     <group>
       {layers.map((layer, index) => (
-        <mesh key={index} scale={[layer.scale, layer.scale, layer.scale]} renderOrder={renderOrder}>
+        <mesh key={index} scale={[layer.scale, layer.scale, layer.scale]} position={position}>
           <boxGeometry args={[w, h, d]} />
           <meshBasicMaterial
             color={color}
@@ -65,21 +44,20 @@ export function GlowBox(props: GlowBoxProps) {
   );
 }
 
-export function GlowRoundedBox(props: GlowBoxProps) {
-  const {
-    size = 10,
-    color = 'white',
-    glowIntensity = 0.3,
-    glowLayers = 3,
-    scaleStep = 0.08,
-    radius = 1,
-    smoothness = 1,
-    bevelSegments = 1,
-    stencil,
-    renderOrder
-  } = props;
+export function GlowRoundedBox({
+  size,
+  position = [0, 0, 0],
+  color = 'white',
+  glowIntensity = 0.3,
+  glowLayers = 3,
+  scaleStep = 0.08,
+  radius = 1,
+  smoothness = 1,
+  bevelSegments = 1,
+  stencil
+}: GlowBoxProps) {
 
-  const { layers, w, h, d } = generateLayers(size, glowLayers, scaleStep, glowIntensity);
+  const { layers, w, h, d } = generateGlowLayers(size, glowLayers, scaleStep, glowIntensity);
 
   return (
     <group>
@@ -87,10 +65,10 @@ export function GlowRoundedBox(props: GlowBoxProps) {
         <RoundedBox
           key={index}
           args={[w * layer.scale, h * layer.scale, d * layer.scale]}
+          position={position}
           radius={radius * layer.scale}
           smoothness={smoothness}
           bevelSegments={bevelSegments}
-          renderOrder={renderOrder}
         >
           <meshBasicMaterial
             color={color}
