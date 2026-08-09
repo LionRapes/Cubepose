@@ -6,10 +6,10 @@ export const BACKGROUND_COLORS = {
     '#FFBC7C'
   ],
   GREEN: [
-    '#13be00',
-    '#aaee3c',
-    '#7eff39',
-    '#79f07d'
+    '#85D4A7',
+    '#9FE4BE',
+    '#7FCF96',
+    '#95DEB0'
   ],
   RED: [
     '#ff0000',

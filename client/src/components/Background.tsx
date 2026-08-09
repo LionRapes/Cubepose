@@ -1,12 +1,13 @@
 import { BACKGROUND_COLORS } from '../config/colors';
 
 import vertexShader from '../shaders/vertex/background.vert.glsl';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { EasingName } from '../utils/easings';
 import { useDebugCommands } from '../hooks/useDebugCommands';
 import { ReadonlyVector3Tuple } from '../types';
 import { useBackgroundTransition } from '../hooks/useBackgroundTransition';
 import { useGradientMaterial } from '../hooks/useGradientMaterial';
+import { backgroundEvents } from '../utils/backgroundEvents';
 
 interface BackgroundProps {
   width?: number;
@@ -26,6 +27,16 @@ export function Background({
   
   const { getOpacity, isAnimating, switchTo, flick } = useBackgroundTransition();
 
+  useEffect(() => {
+    return backgroundEvents.subscribe((cmd) => {
+      if (cmd.type === 'switch') {
+        switchTo(cmd.index, cmd.duration, cmd.ease);
+      } else if (cmd.type === 'flick') {
+        flick(cmd.index, cmd.appearDuration, cmd.disappearDuration, cmd.appearEase, cmd.disappearEase, cmd.holdDelay);
+      }
+    });
+  }, [switchTo, flick]);
+
   useDebugCommands( useMemo(() => ({
     bg: (index: number, duration?: number, ease?: EasingName) => {
       if (index < 0 || index >= stateKeys.length) { console.error(`Invalid index: ${index}.`); return; }
@@ -40,11 +51,9 @@ export function Background({
     }
   }), [isAnimating, flick, switchTo]));
 
-
   return (
     <>
       {stateValues.map((stateColors, index) => {
-        
         const opacity = getOpacity(index);
         if (opacity === 0) return null;
         return (

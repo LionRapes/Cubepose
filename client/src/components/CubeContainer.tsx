@@ -1,44 +1,45 @@
-import React from "react";
-import { CubeOffset } from "../types";
-import { GameProvider } from "../context/GameContext";
+import { ReactNode } from "react";
+import { CubeOffset, ReadonlyVector3Tuple } from "../types";
+import { useLevel } from "../context/LevelContext";
+import { ContainerProvider } from "../context/ContainerContext";
 
 interface CubeContainerProps {
-  size: [number, number, number];
-  position?: [number, number, number];
+  containerId: string;
+  size: ReadonlyVector3Tuple;
+  position?: ReadonlyVector3Tuple;
   blockedCells?: CubeOffset[];
-  children: React.ReactNode;
-  onActivate?: (center: [number, number, number]) => void;
+  children: ReactNode;
 }
 
 export function CubeContainer({
+  containerId,
   size,
-  blockedCells = [],
-  children,
   position = [0, 0, 0],
-  onActivate
+  blockedCells = [],
+  children
 }: CubeContainerProps) {
   const [width, height, depth] = size;
-  const center: [number, number, number] = [width / 2, height / 2, depth / 2];
-
-  const handleClick = () => {
-    if (onActivate) {
-      onActivate([
-        position[0] + center[0],
-        position[1] + center[1],
-        position[2] + center[2],
-      ]);
-    }
-  };
+  const {activeContainerId, setActiveContainerId} = useLevel();
 
   return (
-    <GameProvider width={width} height={height} depth={depth} blockedCells={blockedCells}>
-      <group position={position}>
-        <mesh position={center} onClick={handleClick} visible={false}>
-          <boxGeometry args={[width*1.5, height*1.5, depth*1.5]}/>
-        </mesh>
+    <ContainerProvider 
+      containerId={containerId}  
+      position={position} 
+      width={width} height={height} depth={depth} 
+      blockedCells={blockedCells}
+    >
+      <group position={position} userData={{containerId}}>
+        {activeContainerId !== containerId && (
+          <mesh 
+           position={[width/2, height/2, depth/2]} 
+           onClick={(() => setActiveContainerId(containerId))} visible={false}
+          >
+            <boxGeometry args={[width*1.5, height*1.5, depth*1.5]}/>
+          </mesh>
+        )}
         {children}
       </group>
-    </GameProvider>
+    </ContainerProvider>
     
   );
 }

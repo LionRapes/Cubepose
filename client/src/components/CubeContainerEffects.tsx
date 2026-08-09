@@ -1,8 +1,9 @@
 import { Mask, RoundedBoxGeometry, useMask } from "@react-three/drei";
 import { GlowRoundedBox } from "./GlowBox";
+import { ReadonlyVector3Tuple, Vector3Tuple } from "../types";
 
 interface CubeContainerEffectsProps {
-  size: [number, number, number];
+  size: ReadonlyVector3Tuple;
   color: string;
 }
 
@@ -16,7 +17,7 @@ export function CubeContainerEffects({
   return (
     <>
       <Mask id={1} position={offset}>
-        <RoundedBoxGeometry args={size} radius={0.2} smoothness={4} bevelSegments={4}/>
+        <RoundedBoxGeometry args={size as Vector3Tuple} radius={0.2} smoothness={4} bevelSegments={4}/>
       </Mask>
 
       <GlowRoundedBox position={offset} size={size} color={color} glowIntensity={0.35} radius={0.2} scaleStep={0.01} glowLayers={15} stencil={stencil} smoothness={4} bevelSegments={4}/>

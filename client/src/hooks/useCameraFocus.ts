@@ -2,23 +2,27 @@ import { useCallback, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import { Vector3 } from 'three';
+import { cameraEvents } from '../utils/cameraEvents';
+import { ReadonlyVector3Tuple } from '../types';
 
 export function useCameraFocus() {
-  const controlsRef = useRef<OrbitControlsImpl>(null!);
+  const orbitControlsRef = useRef<OrbitControlsImpl>(null!);
   const { camera } = useThree();
   const desiredCenter = useRef<Vector3 | null>(null);
 
 
   const focusOn = useCallback(
-    (newCenter: Vector3) => {
-      if (!controlsRef.current) return;
+    (target: ReadonlyVector3Tuple) => {
+      if (!orbitControlsRef.current) return;
+      const newCenter = new Vector3(target[0], target[1], target[2]);
       desiredCenter.current = newCenter;
+      cameraEvents.emit({ type: 'focusStart', center: newCenter });
     },
-    [camera, controlsRef]
+    [camera, orbitControlsRef]
   );
 
   useFrame((_, delta) => {
-    const controls = controlsRef.current;
+    const controls = orbitControlsRef.current;
     if (!desiredCenter.current || !controls)
       return;
 
@@ -28,9 +32,10 @@ export function useCameraFocus() {
     controls.update();
     
     if (controls.target.distanceTo(desiredCenter.current) < 0.1) {
+      cameraEvents.emit({ type: 'focusEnd', center: desiredCenter.current });
       desiredCenter.current = null;
     }
   });
 
-  return { controlsRef, focusOn };
+  return { orbitControlsRef, focusOn };
 }
