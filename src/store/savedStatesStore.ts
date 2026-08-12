@@ -7,6 +7,7 @@ interface SavedStatesStore {
   saveState: (id: string, state: LevelState) => void;
   getState: (id: string) => LevelState | undefined;
   removeState: (id: string) => void;
+  resetStore: () => void;
 }
 
 export const useSavedStates = create<SavedStatesStore>() (
@@ -17,7 +18,8 @@ export const useSavedStates = create<SavedStatesStore>() (
       removeState: (id) => set((prev) => {
         const { [id]: _, ...rest } = prev.states;
         return { states: rest };
-      })
+      }),
+      resetStore: () => set({ states: {} }),
     }),
     { name: 'SavedStates' }
   )

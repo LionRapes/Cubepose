@@ -1,6 +1,6 @@
 import { Html, OrbitControls, OrthographicCamera } from '@react-three/drei';
 import { useCameraFocus } from '../hooks/useCameraFocus';
-import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react';
+import { useEffect, useEffectEvent, useMemo, useState } from 'react';
 import { useDebugCommands } from '../hooks/useDebugCommands';
 import { useLevelSwitcher } from '../hooks/useLevelSwitcher';
 import { Level } from './Level';
@@ -11,7 +11,6 @@ export function GameScene() {
   const { orbitControlsRef, focusOn } = useCameraFocus();
   const { currentLevel, handleSwitchLevel, switchToNextLevel } = useLevelSwitcher();
   const [isVictory, setVictory] = useState(false);
-  const backgroundRef = useRef(0);
 
   useEffect(() => {
     handleSwitchLevel('level1');
@@ -19,7 +18,7 @@ export function GameScene() {
 
   useEffect(() => {
     if (isVictory) {
-      backgroundRef.current = setTimeout(() => {
+      setTimeout(() => {
         backgroundEvents.emit({
           type: 'switch',
           index: 1,
@@ -29,7 +28,7 @@ export function GameScene() {
       }, 100);
       
     } else {
-      backgroundRef.current = setTimeout(() => {
+      setTimeout(() => {
         backgroundEvents.emit({
           type: 'switch',
           index: 0,
@@ -73,7 +72,7 @@ export function GameScene() {
       isVictory={isVictory}
       setVictory={setVictory}
     >
-      <OrbitControls minZoom={50} maxZoom={150} ref={orbitControlsRef} enabled={true} enablePan={false}/>
+      <OrbitControls minZoom={50} maxZoom={150} ref={orbitControlsRef} enabled={true} enablePan={false} minPolarAngle={0.5} maxPolarAngle={2.6}/>
       <OrthographicCamera makeDefault position={[10, 10, 10]} zoom={50}/>
 
       {currentLevel && <Level key={currentLevel.id} level={currentLevel}/>}

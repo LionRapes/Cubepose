@@ -9,7 +9,7 @@ import { useDrag } from '../hooks/useDrag';
 import { useThrottle } from '../hooks/useThrottle';
 import { useRelativeRotation } from '../hooks/useRelativeRotation';
 import { DEFAULT_GEOMETRY, DEFAULT_QUATERNION, DEFAULT_SCALE } from '../constants';
-import { HUD_MARGIN_X, HUD_MARGIN_Y, HUD_SCALE, HUD_SPACING_X } from '../config/hud';
+import { HUD_MARGIN_X, HUD_MARGIN_Y, HUD_SCALE, HUD_SPACING_X, HUD_SPACING_Y } from '../config/hud';
 import { CELL_COLORS } from '../config/colors';
 import { waitFor } from '../utils/waitFor';
 
@@ -141,8 +141,14 @@ export function Piece({
   useFrame(() => {
     if (!pieceGroupRef.current) return;
     if (level.activeScenePieceId !== pieceId && !dragState.isActive()) {
-      const localX = -viewport.width / 2 + HUD_MARGIN_X + (pieceId * HUD_SPACING_X);
-      const localY = -viewport.height / 2 + HUD_MARGIN_Y;
+      const index = pieceId - 1; 
+      const usableWidth = viewport.width - (HUD_MARGIN_X * 2);
+      const itemsPerRow = Math.max(1, Math.floor(usableWidth / HUD_SPACING_X));
+      const column = index % itemsPerRow;
+      const row = Math.floor(index / itemsPerRow);
+
+      const localX = -viewport.width / 2 + HUD_MARGIN_X + (column * HUD_SPACING_X);
+      const localY = -viewport.height / 2 + HUD_MARGIN_Y + (row * HUD_SPACING_Y);
       const localZ = -15;
       
       const targetLocal = new Vector3(localX, localY, localZ);

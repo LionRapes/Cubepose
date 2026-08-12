@@ -25,7 +25,7 @@ export function CubeContainerVisualization({ colorMap }: { colorMap: Map<number,
                               isOccupied ? colorMap.get(cellId) ?? CELL_COLORS.error : CELL_COLORS.empty;
           
           const targetOpacity = isComplete() ? 1 :
-                                isBlocked ? 0.4 :
+                                isBlocked ? 0.9 :
                                 isOccupied ? 0.9 : 0.05;
 
           if (isComplete()) targetColor.lerp(CELL_COLORS.finished, .05);
@@ -76,7 +76,7 @@ export function CubeContainerVisualization({ colorMap }: { colorMap: Map<number,
                             isOccupied ? colorMap.get(cellId) ?? CELL_COLORS.error : CELL_COLORS.empty;
         
         const targetOpacity = isHighlighted || isComplete() ? 1 :
-                              isBlocked ? 0.4 :
+                              isBlocked ? 0.9 :
                               isOccupied ? 0.9 : 0.05;
 
         if (isComplete()) targetColor.lerp(CELL_COLORS.finished, .05);

@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { levels } from '../config/levels';
 import { backgroundEvents } from '../utils/backgroundEvents';
 import { LevelConfig } from '../types';
+import { useSavedStates } from '../store/savedStatesStore';
 
 export function useLevelSwitcher() {
   const [currentLevel, setCurrentLevel] = useState<LevelConfig>(levels[0]);
@@ -28,6 +29,9 @@ export function useLevelSwitcher() {
     const currentIndex = levels.findIndex(level => level.id === currentLevel?.id);
     const nextIndex = (currentIndex + 1) % levels.length;
     const nextLevel = levels[nextIndex];
+    if (nextIndex < currentIndex) 
+      useSavedStates.setState({ states: {}});
+    
     handleSwitchLevel(nextLevel.id);
   }, [currentLevel, handleSwitchLevel]);
 
