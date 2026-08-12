@@ -1,26 +1,33 @@
 {
-  "name": "Cubepose",
+  "name": "client",
+  "version": "1.0.0",
   "private": true,
+  "type": "module",
+  "dependencies": {
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.6.1",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "three": "^0.185.1",
+    "three-stdlib": "^2.36.1",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@types/three": "^0.185.1",
+    "@vitejs/plugin-react": "^6.0.3",
+    "typescript": "^7.0.2",
+    "vite": "^8.1.4",
+    "vite-plugin-glsl": "^1.6.0"
+  },
   "scripts": {
-    "dev": "docker-compose --env-file .env-dev up",
-    "client-dev": "docker-compose --env-file .env-dev up client",
-    "server-dev": "docker-compose --env-file .env-dev up server",
-    "dev:build": "docker-compose --env-file .env-dev up --build",
-    "dev:build-only": "docker-compose --env-file .env-dev build",
-
-    "prod": "docker-compose --env-file .env-prod up",
-    "client-prod": "docker-compose --env-file .env-prod up client",
-    "server-prod": "docker-compose --env-file .env-prod up server",
-    "prod:build": "docker-compose --env-file .env-prod up --build",
-    "prod:build-only": "docker-compose --env-file .env-prod build",
-    
-    "down": "docker-compose --env-file .env-dev down",
-    "logs": "docker-compose logs -f",
-    "logs:server": "docker-compose logs -f server",
-    "logs:client": "docker-compose logs -f client",
-    "shell:server": "docker-compose exec server sh",
-    "shell:client": "docker-compose exec client sh",
-    "clean": "docker-compose --env-file .env-dev down -v --rmi all",
-    "status": "docker-compose ps"
+    "dev": "vite --host",
+    "build": "vite build",
+    "start": "vite preview",
+    "dev:containerUp": "docker run -p 3000:5173 --env-file .env --env-file .env.dev cubepose:dev",
+    "dev:containerBuild": "docker build --target development -t cubepose:dev .",
+    "prod:containerUp": "docker run -p 3000:80 --env-file .env --env-file .env.prod cubepose:prod",
+    "prod:containerBuild": "docker build --target production -t cubepose:prod ."
   }
 }
