@@ -24,10 +24,6 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
-    "start": "vite preview",
-    "dev:containerUp": "docker run -p 3000:5173 --env-file .env --env-file .env.dev cubepose:dev",
-    "dev:containerBuild": "docker build --target development -t cubepose:dev .",
-    "prod:containerUp": "docker run -p 3000:80 --env-file .env --env-file .env.prod cubepose:prod",
-    "prod:containerBuild": "docker build --target production -t cubepose:prod ."
+    "start": "vite preview"
   }
 }

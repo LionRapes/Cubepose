@@ -1,6 +1,6 @@
 FROM node:24-alpine AS base
 WORKDIR /app
-COPY package.json ./
+COPY package*.json ./
 
 #DEVELOPMENT
 FROM base AS development

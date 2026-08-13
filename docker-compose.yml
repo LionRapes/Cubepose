@@ -1,0 +1,30 @@
+version: '3.8'
+name: cubepose
+
+services:
+  dev:
+    build:
+      context: .
+      target: development
+    image: cubepose:dev
+    container_name: cubepose-dev
+    volumes:
+      - ./src:/app/src
+      - /app/node_modules
+    ports:
+      - "3000:5173"
+    env_file:
+      - .env
+      - .env.dev
+
+  prod:
+    build:
+      context: .
+      target: production
+    image: cubepose:prod
+    container_name: cubepose-prod
+    ports:
+      - "3000:80"
+    env_file:
+      - .env
+      - .env.prod
